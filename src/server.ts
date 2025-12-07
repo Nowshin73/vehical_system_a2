@@ -7,11 +7,11 @@ import { userRoute } from "./modules/users/users.route";
 
 const app = express();
 app.use(express.json());
-console.log("db connect",config.port);
-initDB();
+const port = config.port;
+ initDB();
 
 
-app.use("/api/v1/auth/signup", userRoute);
+// app.use("/api/v1/auth/signup", userRoute);
 // app.use("/api/v1/auth", authRoute);
 
 
@@ -28,6 +28,6 @@ app.use((req, res) => {
     path: req.path,
   });
 });
-app.listen(config.port, () => {
-  console.log("Server is running on post 5000");
+app.listen(port, () => {
+  console.log(`server is running on ${port}`);
 });

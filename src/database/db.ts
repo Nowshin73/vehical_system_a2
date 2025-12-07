@@ -1,9 +1,9 @@
 import { Pool } from "pg";
+import config from "../config";
 //import config from "../config";
 
 export const pool = new Pool({
-  connectionString: "postgresql://neondb_owner:npg_JoGx3hD0RCim@ep-lively-frost-a4pymnhd-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
-});
+  connectionString: config.connection_str});
 
 export const initDB = async () => {
   await pool.query(`
