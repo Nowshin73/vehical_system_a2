@@ -4,6 +4,21 @@ import jwt from "jsonwebtoken";
 
 export const secret = "KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30";
 
+const createUser = async (payload: Record<string, unknown>) => {
+  const { name, email, password, phone, role } = payload;
+
+  const hashPassword = await bcrypt.hash(password as string, 12);
+
+  const result = await pool.query(
+    `
+      INSERT INTO Users(name,email,password, phone, role) VALUES($1,$2,$3,$4,$5) RETURNING id,name,email,phone,role
+    `,
+    [name, email, hashPassword, phone, role]
+  );
+
+  return result;
+};
+
 const loginUserIntoDB = async (email: string, password: string) => {
   const user = await pool.query(
     `
@@ -33,4 +48,5 @@ const loginUserIntoDB = async (email: string, password: string) => {
 
 export const authServices = {
   loginUserIntoDB,
+  createUser
 };
