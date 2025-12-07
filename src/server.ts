@@ -3,7 +3,7 @@ import { initDB } from "./database/db";
 import { logger } from "./middleware/logged";
 import config from "./config";
 import { userRoute } from "./modules/users/users.route";
-// import { userRoute } from "./modules/users/users.route";
+
 
 const app = express();
 app.use(express.json());
@@ -11,7 +11,7 @@ const port = config.port;
  initDB();
 
 
-// app.use("/api/v1/auth/signup", userRoute);
+app.use("/api/v1/auth/signup", userRoute);
 // app.use("/api/v1/auth", authRoute);
 
 

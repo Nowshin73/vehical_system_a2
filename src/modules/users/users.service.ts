@@ -8,7 +8,7 @@ const createUser = async (payload: Record<string, unknown>) => {
 
   const result = await pool.query(
     `
-      INSERT INTO Users(name,email,password, phone, role) VALUES($1,$2,$3,$4) RETURNING id,name,email,phone,role
+      INSERT INTO Users(name,email,password, phone, role) VALUES($1,$2,$3,$4,$5) RETURNING id,name,email,phone,role
     `,
     [name, email, hashPassword, phone, role]
   );
