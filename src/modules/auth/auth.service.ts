@@ -1,8 +1,9 @@
 import bcrypt from "bcryptjs";
 import { pool } from "../../database/db";
+import config from "../../config";
 import jwt from "jsonwebtoken";
+export const secret = config.jwt_secret;
 
-export const secret = "KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30";
 
 const createUser = async (payload: Record<string, unknown>) => {
   const { name, email, password, phone, role } = payload;
@@ -19,31 +20,34 @@ const createUser = async (payload: Record<string, unknown>) => {
   return result;
 };
 
-const loginUserIntoDB = async (email: string, password: string) => {
-  const user = await pool.query(
-    `
-        SELECT * FROM users WHERE email=$1
-        `,
+
+export const loginUserIntoDB = async (email: string, password: string) => {
+  const result = await pool.query(
+    `SELECT * FROM users WHERE email=$1`,
     [email]
   );
-  if (user.rows.length === 0) {
+
+  if (result.rows.length === 0) {
     throw new Error("User not found!");
   }
-  const matchPassowrd = await bcrypt.compare(password, user.rows[0].password);
 
-  if (!matchPassowrd) {
-    throw new Error("Invalid Credentials!");
-  }
-  const jwtPayload = {
-    id: user.rows[0].id,
-    name: user.rows[0].name,
-    email: user.rows[0].email,
-    role : user.rows[0].role,
+  const user = result.rows[0];
+
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) throw new Error("Invalid Credentials!");
+
+  const payload = {
+    id: user.id,
+    email: user.email,
+    role: user.role,
+    name: user.name,
   };
 
-  const token = jwt.sign(jwtPayload, secret, { expiresIn: "7d" });
+  const token = jwt.sign(payload, secret as string, { expiresIn: "7d" });
 
-  return { token, user: user.rows[0] };
+  delete user.password;
+
+  return { token, user };
 };
 
 export const authServices = {

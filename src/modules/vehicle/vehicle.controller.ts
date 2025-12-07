@@ -1,30 +1,41 @@
 import { Request, Response } from "express";
-import { userServices } from "./users.service";
-import { vehicleServices } from "./vehicle.service";
+// import { userServices } from "./users.service";
+import { updateVehicleInDB, vehicleServices } from "./vehicle.service";
 
 const createVehicle = async (req: Request, res: Response) => {
   try {
+    console.log("Received body:", req.body);
+
     const result = await vehicleServices.createVehicle(req.body);
+
     return res.status(201).json({
       success: true,
       message: "Vehicle created successfully",
-      data: result.rows[0]
+      data: result.rows[0],
     });
   } catch (error: any) {
     return res.status(500).json({
-      success: true,
+      success: false,
       message: error.message,
     });
   }
 };
+
 const getAllVehicles = async (req: Request, res: Response) => {
   try {
     const result = await vehicleServices.getAllVehicles();
-    return res.status(200).json({
-      success: true,
-      message: "Vehicles retrieved successfully",
-      data: result.rows,
-    });
+    if (result.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        message: "Vehicle not found",
+      });
+    } else {
+      res.status(200).json({
+        success: true,
+        message: "Vehicle retrieved successfully",
+        data: result.rows,
+      });
+    }
   } catch (error: any) {
     return res.status(500).json({
       success: true,
@@ -56,46 +67,74 @@ const deleteVehicle = async (req:Request, res:Response) =>{
       });
     }
 }
-const updateVehicle = async (req: Request, res: Response) => {
-  // console.log(req.params.id);
- // const { name, email } = req.body;
+export const updateVehicle = async (req: Request, res: Response) => {
   try {
-    const result = await vehicleServices.updateVehicle(req.body,req.params.vehicleId!);
+    const vehicle = await updateVehicleInDB(
+      Number(req.params.vehicleId),
+      req.body,
+      req.user!.role
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Vehicle updated successfully",
+      data: vehicle,
+    });
+
+  } catch (e: any) {
+    res.status(400).json({ success: false, message: e.message });
+  }
+};
+// const updateVehicle = async (req: Request, res: Response) => {
+//   // console.log(req.params.id);
+//  // const { name, email } = req.body;
+//   try {
+//     const result = await vehicleServices.updateVehicle(req.body,req.params.vehicleId!);
    
+//     if (result.rows.length === 0) {
+//       res.status(404).json({
+//         success: false,
+//         message: "Vehicle not found",
+//       });
+//     } else {
+//       res.status(200).json({
+//         success: true,
+//         message: "Vehicle updated successfully",
+//         data: result.rows[0],
+//       });
+//     }
+//   } catch (err: any) {
+//     res.status(500).json({
+//       success: false,
+//       message: err.message,
+//     });
+//   }
+// };
+const getVehicleDetail = async (req: Request, res: Response) => {
+  try {
+    const result = await vehicleServices.getVehicleDetail(req.params.vehicleId!);
+
     if (result.rows.length === 0) {
-      res.status(404).json({
+      return res.status(404).json({
         success: false,
         message: "Vehicle not found",
       });
-    } else {
-      res.status(200).json({
-        success: true,
-        message: "Vehicle updated successfully",
-        data: result.rows[0],
-      });
     }
-  } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: err.message,
-    });
-  }
-};
-const getVehicleDetail = async (req: Request, res: Response) => {
-  try {
-    const result = await vehicleServices.updateVehicle(req.body,req.params.vehicleId!);
-    return res.status(201).json({
+
+    return res.status(200).json({
       success: true,
-      message: "Vehicle updated successfully",
-      data: result.rows,
+      message: "Vehicle retrieved successfully",
+      data: result.rows[0],
     });
+
   } catch (error: any) {
     return res.status(500).json({
-      success: true,
+      success: false,
       message: error.message,
     });
   }
 };
+
 
 export const vehicleController = {
    createVehicle,

@@ -5,10 +5,11 @@ import config from "./config";
 import { userRoute } from "./modules/users/users.route";
 import { authRoute } from "./modules/auth/auth.route";
 import { vehicleRoute } from "./modules/vehicle/vehicle.route";
-
-
 const app = express();
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 const port = config.port;
  initDB();
 
@@ -16,7 +17,7 @@ const port = config.port;
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/users", userRoute);
 app.use("/api/v1/vehicles", vehicleRoute);
-// app.use("/api/v1/auth", authRoute);
+
 
 
 app.get("/", (req: Request, res: Response) => {
