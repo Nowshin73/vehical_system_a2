@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 // import { userServices } from "./users.service";
-import { updateVehicleInDB, vehicleServices } from "./vehicle.service";
+import {  vehicleServices } from "./vehicle.service";
 
 const createVehicle = async (req: Request, res: Response) => {
   try {
@@ -77,10 +77,10 @@ const deleteVehicle = async (req: Request, res: Response) => {
 
 const updateVehicle = async (req: Request, res: Response) => {
   try {
-    const vehicle = await updateVehicleInDB(
-      Number(req.params.vehicleId),
+    const vehicle = await vehicleServices.updateVehicle(
       req.body,
-      req.user!.role
+      req.params.vehicleId!,
+  
     );
 
     res.status(200).json({
@@ -93,31 +93,7 @@ const updateVehicle = async (req: Request, res: Response) => {
     res.status(400).json({ success: false, message: e.message });
   }
 };
-// const updateVehicle = async (req: Request, res: Response) => {
-//   // console.log(req.params.id);
-//  // const { name, email } = req.body;
-//   try {
-//     const result = await vehicleServices.updateVehicle(req.body,req.params.vehicleId!);
-   
-//     if (result.rows.length === 0) {
-//       res.status(404).json({
-//         success: false,
-//         message: "Vehicle not found",
-//       });
-//     } else {
-//       res.status(200).json({
-//         success: true,
-//         message: "Vehicle updated successfully",
-//         data: result.rows[0],
-//       });
-//     }
-//   } catch (err: any) {
-//     res.status(500).json({
-//       success: false,
-//       message: err.message,
-//     });
-//   }
-// };
+
 const getVehicleDetail = async (req: Request, res: Response) => {
   try {
     const result = await vehicleServices.getVehicleDetail(req.params.vehicleId!);

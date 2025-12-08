@@ -49,34 +49,6 @@ const deleteVehicle = async (id: string) => {
 
   return 1; 
 }
-// export const updateVehicle= async (
-//   id: number,
-//   payload: any,
-//   role: string
-// ) => {
-//   if (role === "customer") {
-//     delete payload.daily_rent_price;
-//     delete payload.registration_number;
-//     delete payload.type;
-//   }
-
-//   const fields = Object.keys(payload);
-//   const values = Object.values(payload);
-
-//   if (fields.length === 0) throw new Error("No fields to update");
-
-//   const set = fields.map((f, i) => `${f}=$${i + 1}`).join(",");
-
-//   const result = await pool.query(
-//     `UPDATE vehicles SET ${set} WHERE id=$${fields.length + 1} RETURNING *`,
-//     [...values, id]
-//   );
-
-//   if (result.rows.length === 0) throw new Error("Vehicle not found");
-
-//   return result.rows[0];
-// };
-
 
 const updateVehicle = async (payload: Record<string, unknown>, id: string) => {
   const { vehicle_name, type, registration_number, daily_rent_price, availability_status } = payload;

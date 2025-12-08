@@ -45,9 +45,14 @@ export const loginUser = async (email: string, password: string) => {
   const token = jwt.sign(payload, secret as string, { expiresIn: "7d" });
 
   console.log(token)
-  // delete user.password;
-
-  return { token, user };
+    const userResponse = {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    phone: user.phone,
+    role: user.role,
+  };
+  return { token, user:userResponse };
 };
 
 export const authServices = {
