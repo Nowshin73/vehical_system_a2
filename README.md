@@ -25,7 +25,7 @@
 - **Database:** PostgreSQL  
 - **Authentication:** JWT, bcrypt  
 - **Tools:** VS Code, Postman, Git & GitHub  
-- **Deployment:** [Your Deployment Service] (e.g., Render, Railway, Heroku)
+
 
 
 
