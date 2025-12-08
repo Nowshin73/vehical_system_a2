@@ -15,12 +15,12 @@ const deleteUser = async (userId: string) => {
  const result = await pool.query(`DELETE FROM Users WHERE id = $1`, [userId]);
  return result;
 }
-const getSingleUser = async (email: string) => {
+const getSingleUser = async (id: string) => {
   const result = await pool.query(
     `
-    SELECT id,name,email,phone,role FROM users WHERE email=$1
+    SELECT * FROM Users WHERE id=$1
     `,
-    [email]
+    [id]
   );
 
   return result;
@@ -33,9 +33,21 @@ const updateUser = async (payload: Record<string, unknown>, id:string)=>{
       [name, email, phone, role, id])
    return result;
 }
+
+const checkActiveBookings = async (userId: string) => {
+  return await pool.query(
+    `
+    SELECT * FROM bookings 
+    WHERE user_id = $1 AND status = 'active'
+    `,
+    [userId]
+  );
+};
+
 export const userServices = {
   getAllUser,
   getSingleUser,
   deleteUser,
-  updateUser
+  updateUser,
+  checkActiveBookings
 };

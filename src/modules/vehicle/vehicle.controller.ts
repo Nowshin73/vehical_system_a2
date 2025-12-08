@@ -44,30 +44,38 @@ const getAllVehicles = async (req: Request, res: Response) => {
   }
 };
 
-const deleteVehicle = async (req:Request, res:Response) =>{
-   try {
-      const result = await vehicleServices.deleteVehicle(req.params.vehicleId!)
-  
-      if (result.rowCount === 0) {
-        res.status(404).json({
-          success: false,
-          message: "Vehicle not found",
-        });
-      } else {
-        res.status(200).json({
-          success: true,
-          message: "Vehicle deleted successfully",
-          data: result.rows,
-        });
-      }
-    } catch (err: any) {
-      res.status(500).json({
+const deleteVehicle = async (req: Request, res: Response) => {
+  try {
+    const result = await vehicleServices.deleteVehicle(req.params.vehicleId!);
+
+    if (result === 2) {
+      return res.status(400).json({
         success: false,
-        message: err.message,
+        message: "Cannot delete: Active bookings found",
       });
     }
-}
-export const updateVehicle = async (req: Request, res: Response) => {
+
+    if (result === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Vehicle not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Vehicle deleted successfully",
+    });
+
+  } catch (err: any) {
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+const updateVehicle = async (req: Request, res: Response) => {
   try {
     const vehicle = await updateVehicleInDB(
       Number(req.params.vehicleId),

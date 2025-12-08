@@ -1,35 +1,66 @@
 import { Request, Response } from "express";
-import { createBookingInDB, updateBookingStatus } from "./booking.service";
+import { bookingService } from "./booking.service";
 
-export const createBooking = async (req: Request, res: Response) => {
+
+const createBooking = async (req: Request, res: Response) => {
   try {
-    const result = await createBookingInDB(req.body);
+    const user = req.user!;
 
-    res.status(201).json({
+    const result = await bookingService.createBooking(req.body, user);
+
+    return res.status(201).json({
       success: true,
       message: "Booking created successfully",
       data: result,
     });
-
-  } catch (e: any) {
-    res.status(400).json({ success: false, message: e.message });
+  } catch (err: any) {
+    return res.status(400).json({
+      success: false,
+      message: err.message,
+    });
   }
 };
-export const updateBooking = async (req: Request, res: Response) => {
-  try {
-    const result = await updateBookingStatus(
-      Number(req.params.bookingId),
-      req.body.status,
-      req.user!.role
-    );
 
-    res.status(200).json({
+const getBookings = async (req: Request, res: Response) => {
+  try {
+    const user = req.user!;
+
+    const result = await bookingService.getBookings(user);
+
+    return res.status(200).json({
       success: true,
-      message: "Booking updated successfully",
       data: result,
     });
-
-  } catch (e: any) {
-    res.status(400).json({ success: false, message: e.message });
+  } catch (err: any) {
+    return res.status(400).json({
+      success: false,
+      message: err.message,
+    });
   }
 };
+
+const updateBooking = async (req: Request, res: Response) => {
+  try {
+    const user = req.user!;
+    const bookingId = req.params.bookingId!;
+
+    const result = await bookingService.updateBooking(bookingId, user);
+
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.data ?? null,
+    });
+  } catch (err: any) {
+    return res.status(400).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+export const bookingController = {
+  createBooking,
+  getBookings,
+  updateBooking
+}

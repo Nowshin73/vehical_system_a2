@@ -1,8 +1,21 @@
 import { Router } from "express";
 import auth from "../../middleware/auth";
-import { createBooking, updateBooking } from "./booking.controller";
+import { bookingController } from "./booking.controller";
 
-export const bookingRoute = Router();
 
-bookingRoute.post("/", auth("admin", "customer"), createBooking);
-bookingRoute.put("/:bookingId", auth("admin", "customer"), updateBooking);
+const router = Router();
+
+// Create booking (customer + admin)
+router.post("/", auth("customer", "admin"), bookingController.createBooking);
+
+// Get bookings (role-based)
+router.get("/", auth("customer", "admin"), bookingController.getBookings);
+
+// Update booking (cancel or return)
+router.put("/:bookingId", auth("customer", "admin"), bookingController.updateBooking);
+
+
+
+
+
+export const bookingRoute = router;

@@ -1,10 +1,10 @@
 import express, { Request, Response } from "express";
 import { initDB } from "./database/db";
-import { logger } from "./middleware/logged";
 import config from "./config";
 import { userRoute } from "./modules/users/users.route";
 import { authRoute } from "./modules/auth/auth.route";
 import { vehicleRoute } from "./modules/vehicle/vehicle.route";
+import { bookingRoute } from "./modules/booking/booking.route";
 const app = express();
 
 app.use(express.json());
@@ -17,6 +17,7 @@ const port = config.port;
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/users", userRoute);
 app.use("/api/v1/vehicles", vehicleRoute);
+app.use("/api/v1/bookings", bookingRoute);
 
 
 

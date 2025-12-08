@@ -21,36 +21,36 @@ const createUser = async (payload: Record<string, unknown>) => {
 };
 
 
-export const loginUserIntoDB = async (email: string, password: string) => {
+export const loginUser = async (email: string, password: string) => {
   const result = await pool.query(
     `SELECT * FROM users WHERE email=$1`,
     [email]
   );
 
   if (result.rows.length === 0) {
-    throw new Error("User not found!");
+    return "User not found!";
   }
 
   const user = result.rows[0];
 
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) throw new Error("Invalid Credentials!");
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) return "Invalid Credentials!";
 
   const payload = {
-    id: user.id,
+    name: user.name,
     email: user.email,
     role: user.role,
-    name: user.name,
   };
 
   const token = jwt.sign(payload, secret as string, { expiresIn: "7d" });
 
-  delete user.password;
+  console.log(token)
+  // delete user.password;
 
   return { token, user };
 };
 
 export const authServices = {
-  loginUserIntoDB,
+  loginUser,
   createUser
 };
