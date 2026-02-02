@@ -27,10 +27,20 @@ const getBookings = async (req: Request, res: Response) => {
 
     const result = await bookingService.getBookings(user);
 
-    return res.status(200).json({
+   if(user.role === "admin"){
+     return res.status(200).json({
       success: true,
+      message:"Bookings retrieved successfully",
       data: result,
     });
+   }
+   else{
+     return res.status(200).json({
+      success: true,
+      message:"Your bookings retrieved successfully",
+      data: result,
+    });
+   }
   } catch (err: any) {
     return res.status(400).json({
       success: false,

@@ -29,7 +29,8 @@ const deleteUser = async (req:Request, res:Response) =>{
         message: "Cannot delete user: User has active bookings"
       });
     }
-     const result = await userServices.deleteUser(req.params.userId!)
+     else{
+      const result = await userServices.deleteUser(req.params.userId!)
   
       if (result.rowCount === 0) {
         res.status(404).json({
@@ -41,9 +42,10 @@ const deleteUser = async (req:Request, res:Response) =>{
         res.status(200).json({
           success: true,
           message: "User deleted successfully",
-          data: result.rows,
+         
         });
       }
+     }
     } catch (err: any) {
       res.status(500).json({
         success: false,
@@ -53,45 +55,41 @@ const deleteUser = async (req:Request, res:Response) =>{
 }
 const updateUser = async (req: Request, res: Response) => {
   try {
-    const loggedInUser= req.user as JwtPayload;
-    const targetUserId = req.params.userId as string;
-    const { role, ...restPayload } = req.body;
-   
-    if (loggedInUser.role === "customer" && loggedInUser.id !== targetUserId) {
-      return res.status(403).json({
-        success: false,
-        message: "Customers can update only their own profile",
-      });
-    }
+    const loggedInUser = req.user as JwtPayload;
+    const targetUserId = req.params.userId;
 
-  
-    if (loggedInUser.role === "customer" && role) {
-      return res.status(403).json({
-        success: false,
-        message: "Customers cannot change role",
-      });
-    }
+    // 1️⃣ Get user from DB
+    const result = await userServices.getUserById(targetUserId!);
+   // const targetUser = result?.rows?.[0];
 
-
-    const finalPayload =
-      loggedInUser.role === "customer"
-        ? restPayload
-        : req.body; 
-
-    const result = await userServices.updateUser(finalPayload, targetUserId);
-
-    if (result.rows.length === 0) {
+    if (!result) {
       return res.status(404).json({
         success: false,
         message: "User not found",
       });
     }
 
+    // 2️⃣ Customers can update ONLY their own profile
+    if (loggedInUser.role === "customer" && loggedInUser.email !== result.email) {
+      return res.status(403).json({
+        success: false,
+        message: "Customers can update only their own profile",
+      });
+    }
+
+    // 3️⃣ Update based on role
+    const updatedUser = await userServices.updateUser(
+      req.body,
+      targetUserId!,
+      loggedInUser.role
+    );
+
     return res.status(200).json({
       success: true,
       message: "User updated successfully",
-      data: result.rows[0],
+      data: updatedUser,
     });
+
   } catch (err: any) {
     return res.status(500).json({
       success: false,
@@ -99,6 +97,7 @@ const updateUser = async (req: Request, res: Response) => {
     });
   }
 };
+
 
 const getSingleUser = async (req: Request, res: Response) => {
   try {

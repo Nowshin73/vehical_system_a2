@@ -77,7 +77,7 @@ const updateVehicle = async (req, res) => {
         res.status(200).json({
             success: true,
             message: "Vehicle updated successfully",
-            data: vehicle,
+            data: vehicle.rows[0],
         });
     }
     catch (e) {
